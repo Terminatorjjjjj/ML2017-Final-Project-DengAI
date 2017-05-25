@@ -173,13 +173,13 @@ def main():
     iq_train_subtest = iq_train.tail(iq_train.shape[0] - 468)
 
     ### Training
-    # if mode <= 1:
-    #     sj_best_model = train_sj_model('sj_model.h5py', sj_train_subtrain, sj_train_subtest)
-    # if mode >= 1:
-    #     iq_best_model = train_iq_model('iq_model.h5py', iq_train_subtrain, iq_train_subtest)
+    if mode <= 1:
+        sj_best_model = train_sj_model('sj_model.h5py', sj_train_subtrain, sj_train_subtest)
+    if mode >= 1:
+        iq_best_model = train_iq_model('iq_model.h5py', iq_train_subtrain, iq_train_subtest)
 
-    sj_best_model = load_model('sj_17-261.h5py')
-    iq_best_model = load_model('iq_03-558.h5py')
+    # sj_best_model = load_model('sj_17-261.h5py')
+    # iq_best_model = load_model('iq_03-558.h5py')
     ### Testing
     if mode == 1:
         testing(test_feature_path, submission_path, prediction_path, 

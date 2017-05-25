@@ -125,10 +125,10 @@ def main():
     with open('iq_svr_model.pickle', 'wb') as iqm:
         pickle.dump(iq_svr_model, iqm)
 
-    with open('sj_svr_16-202.pickle', 'rb') as sjm:
-        sj_svr_model = pickle.load(sjm)
-    with open('iq_svr_03-162.pickle', 'rb') as iqm:
-        iq_svr_model = pickle.load(iqm)
+    # with open('sj_svr_16-202.pickle', 'rb') as sjm:
+    #     sj_svr_model = pickle.load(sjm)
+    # with open('iq_svr_03-162.pickle', 'rb') as iqm:
+    #     iq_svr_model = pickle.load(iqm)
 
     ### Testing
     testing(test_feature_path, submission_path, prediction_path, 
