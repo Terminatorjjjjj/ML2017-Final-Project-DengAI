@@ -1,8 +1,8 @@
 #!/bin/bash
-TRAIN_F=./train_feature.csv
-TRAIN_L=./train_label.csv
-TEST_F=./test_feature.csv
-SUB=./submission_format.csv
+TRAIN_F=./data/train_feature.csv
+TRAIN_L=./data/train_label.csv
+TEST_F=./data/test_feature.csv
+SUB=./data/submission_format.csv
 PRED=./prediction_dnn.csv
 # 0: sj, 1: all, 2: iq
 MODE=1
