@@ -5,4 +5,4 @@ TEST_F=./data/test_feature.csv
 SUB=./data/submission_format.csv
 PRED=./prediction_dnn.csv
 
-python3.6 ./deng_dnn.py $TRAIN_F $TRAIN_L $TEST_F $SUB $PRED
+python3.6 ./rfr.py $TRAIN_F $TRAIN_L $TEST_F $SUB $PRED
