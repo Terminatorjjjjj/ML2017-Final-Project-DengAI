@@ -16,6 +16,8 @@ train_label_path = sys.argv[2]
 test_feature_path = sys.argv[3]
 submission_path = sys.argv[4]
 prediction_path = sys.argv[5]
+run_training = False
+run_testing = True
 
 sj_train = []
 iq_train = []
@@ -40,17 +42,17 @@ target = 'total_cases'
 min_error = np.inf
 
 def preprocess_data(data_path, labels_path=None):
-	print('Reagind data from:', data_path)
+	print('Reading data from:', data_path)
 	# load data and set index to city, year, weekofyear
 	df = pd.read_csv(data_path, index_col=[0, 1, 2])
 
 	# add back weekofyear
 	week = pd.read_csv(data_path, usecols=['weekofyear'])
-	df['week'] = pd.Series(week, index=df.index) 
+	df['week'] = pd.Series(week.values.flatten(), index=df.index) 
 
 	# fill missing values
 	df.fillna(method='ffill', inplace=True)
-
+	
 	# add labels to dataframe
 	if labels_path:
 		labels = pd.read_csv(labels_path, index_col=[0, 1, 2])
@@ -100,43 +102,46 @@ def hyperopt_objective(params):
 	global min_error
 
 	params = {arg: int(value) for arg, value in params.items() if type(value)==type(float(0))}
-	print(params)
+	
 	e = hyperopt_training(params)
 	if e < min_error:
 		min_error = e
-		print('New best:', e)
+		print('New best:', e, 'params:', params)
 
 	return {'loss': e, 'status': STATUS_OK}
 
 def optimize_model(trials):
 	print('Optimizing model for city:', TRAIN_CITY)
-	param_space = {'max_depth': hp.quniform('max_depth', 0, 30, 1),
-					'max_features': hp.quniform('max_features', 0, len(predictor), 1),
-					'n_estimators': hp.qnormal('n_estimators', 500, 200, 1),
-					'min_samples_split': hp.quniform('min_samples_split', 1, 100, 1),
+	param_space = {'max_depth': hp.quniform('max_depth', 1, 200, 1),
+					'max_features': hp.quniform('max_features', 1, len(predictor), 1),
+					'n_estimators': hp.quniform('n_estimators', 250, 750, 1),
+					'min_samples_split': hp.quniform('min_samples_split', 2, 100, 1),
 					'min_samples_leaf': hp.quniform('min_samples_leaf', 1, 10, 1)}
 
-	best_params = fmin(hyperopt_objective, param_space, algo=tpe.suggest, trials=trials, max_evals=500)
+	best_params = fmin(hyperopt_objective, param_space, algo=tpe.suggest, trials=trials, max_evals=1000)
 
 	print('\nBest parameters:', best_params, '\n')
 	return best_params
 
-def main():
+def training(data_path, labels_path):
+	print('Start training...')
 
 	### Read training data
 	global sj_train, iq_train
-	sj_train, iq_train = preprocess_data(train_feature_path, labels_path=train_label_path)
+	sj_train, iq_train = preprocess_data(data_path, labels_path=labels_path)
 
 	### Training
 	global min_error, TRAIN_CITY
 	TRAIN_CITY = 'sj'
 	sj_trials = Trials()
 	sj_params = optimize_model(sj_trials)
+	sj_params = {arg: int(value) for arg, value in sj_params.items() if type(value)==type(float(0))}
 
 	TRAIN_CITY = 'iq'
 	min_error = np.inf
 	iq_trials = Trials()
 	iq_params = optimize_model(iq_trials)
+	iq_params = {arg: int(value) for arg, value in iq_params.items() if type(value)==type(float(0))}
 
 	### Get best model
 	sj_model = RandomForestRegressor(**sj_params)
@@ -144,13 +149,45 @@ def main():
 	iq_model = RandomForestRegressor(**iq_params)
 	iq_model.fit(iq_train[predictor], iq_train[target])
 
-	with open('sj_model.pickle','wb') as f:
+	with open('sj_rfr_model.pickle','wb') as f:
 		pickle.dump(sj_model, f)
-	with open('iq_model.pickle','wb') as f:
+	with open('iq_rfr_model.pickle','wb') as f:
 		pickle.dump(iq_model, f)
 
-	### Testing
+	print('Training is done.')
 
+def testing(data_path, sub_path, pred_path, sj_model_path, iq_model_path):
+	print('Start testing...')
+
+	global predictor
+	sj_test, iq_test = preprocess_data(data_path)
+
+	with open(sj_model_path,'rb') as f:
+		sj_model = pickle.load(f)
+	with open(iq_model_path,'rb') as f:
+		iq_model = pickle.load(f)
+
+	sj_predictions = sj_model.predict(sj_test[predictor]).astype(int)
+	iq_predictions = iq_model.predict(iq_test[predictor]).astype(int)
+
+	submission = pd.read_csv(sub_path, index_col=[0, 1, 2])
+
+	submission.total_cases = np.concatenate([sj_predictions, iq_predictions])
+	submission.to_csv(pred_path)
+
+	print('Testing is done.')
+
+def main():
+
+	### Training
+	if run_training:
+		training(train_feature_path, train_label_path)
+
+	### Testing
+	if run_testing:
+		sj_model_path = 'sj_rfr_model.pickle'
+		iq_model_path = 'iq_rfr_model.pickle'
+		testing(test_feature_path, submission_path, prediction_path, sj_model_path, iq_model_path)
 
 if __name__=='__main__':
 	start_time = time.time()
