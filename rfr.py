@@ -112,9 +112,9 @@ def hyperopt_objective(params):
 
 def optimize_model(trials):
 	print('Optimizing model for city:', TRAIN_CITY)
-	param_space = {'max_depth': hp.quniform('max_depth', 1, 200, 1),
+	param_space = {'max_depth': hp.quniform('max_depth', 1, 100, 1), # 1-200
 					'max_features': hp.quniform('max_features', 1, len(predictor), 1),
-					'n_estimators': hp.quniform('n_estimators', 250, 750, 1),
+					'n_estimators': hp.quniform('n_estimators', 200, 500, 1), # 250-750
 					'min_samples_split': hp.quniform('min_samples_split', 2, 100, 1),
 					'min_samples_leaf': hp.quniform('min_samples_leaf', 1, 10, 1)}
 
@@ -167,9 +167,12 @@ def testing(data_path, sub_path, pred_path, sj_model_path, iq_model_path):
 	with open(iq_model_path,'rb') as f:
 		iq_model = pickle.load(f)
 
-	sj_predictions = sj_model.predict(sj_test[predictor]).astype(int)
-	iq_predictions = iq_model.predict(iq_test[predictor]).astype(int)
+	sj_predictions = sj_model.predict(sj_test[predictor]).astype(float)
+	iq_predictions = iq_model.predict(iq_test[predictor]).astype(float)
 
+	sj_predictions = np.round(moving_avg(sj_predictions, n=3)).astype(int)
+	iq_predictions = np.round(moving_avg(iq_predictions, n=3)).astype(int)
+	
 	submission = pd.read_csv(sub_path, index_col=[0, 1, 2])
 
 	submission.total_cases = np.concatenate([sj_predictions, iq_predictions])
