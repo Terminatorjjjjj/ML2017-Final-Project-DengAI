@@ -16,7 +16,7 @@ train_label_path = sys.argv[2]
 test_feature_path = sys.argv[3]
 submission_path = sys.argv[4]
 prediction_path = sys.argv[5]
-run_training = False
+run_training = True
 run_testing = True
 
 sj_train = []
@@ -40,6 +40,7 @@ predictor = ['week',
 			'station_precip_mm']
 target = 'total_cases'
 min_error = np.inf
+WINDOW = 3
 
 def preprocess_data(data_path, labels_path=None):
 	print('Reading data from:', data_path)
@@ -96,7 +97,7 @@ def hyperopt_training(params):
 		data = sj_train
 	else:
 		data = iq_train
-	return rolling_cross_validation(data, model)
+	return rolling_cross_validation(data, model, window_size=WINDOW)
 
 def hyperopt_objective(params):
 	global min_error
@@ -112,9 +113,9 @@ def hyperopt_objective(params):
 
 def optimize_model(trials):
 	print('Optimizing model for city:', TRAIN_CITY)
-	param_space = {'max_depth': hp.quniform('max_depth', 1, 100, 1), # 1-200
+	param_space = {'max_depth': hp.quniform('max_depth', 1, 300, 1), # 1-200
 					'max_features': hp.quniform('max_features', 1, len(predictor), 1),
-					'n_estimators': hp.quniform('n_estimators', 200, 500, 1), # 250-750
+					'n_estimators': hp.quniform('n_estimators', 300, 750, 1), # 250-750
 					'min_samples_split': hp.quniform('min_samples_split', 2, 100, 1),
 					'min_samples_leaf': hp.quniform('min_samples_leaf', 1, 10, 1)}
 
@@ -170,11 +171,13 @@ def testing(data_path, sub_path, pred_path, sj_model_path, iq_model_path):
 	sj_predictions = sj_model.predict(sj_test[predictor]).astype(float)
 	iq_predictions = iq_model.predict(iq_test[predictor]).astype(float)
 
-	sj_predictions = np.round(moving_avg(sj_predictions, n=3)).astype(int)
-	iq_predictions = np.round(moving_avg(iq_predictions, n=3)).astype(int)
+	print('Moving average window size:', WINDOW)
+	sj_predictions = np.round(moving_avg(sj_predictions, n=WINDOW)).astype(int)
+	iq_predictions = np.round(moving_avg(iq_predictions, n=WINDOW)).astype(int)
 	
 	submission = pd.read_csv(sub_path, index_col=[0, 1, 2])
 
+	print('Save predictions to', pred_path)
 	submission.total_cases = np.concatenate([sj_predictions, iq_predictions])
 	submission.to_csv(pred_path)
 
