@@ -20,15 +20,15 @@ prediction_path = sys.argv[5]
 run_training = True
 run_testing = True
 WINDOW = 3
-MAX_EVAL = 500
+MAX_EVAL = 1500
 
 ADD_LAGGING = True
-LAGGING_WEEK = 2
+LAGGING_WEEK = 3
 ADD_FULL_LAG = True
 EXPWA = False
 
 SHIFT_WEEK = True
-SHIFT_NUM = 2
+SHIFT_NUM = 1
 
 sj_train = []
 iq_train = []
@@ -52,11 +52,13 @@ predictor = ['week',
 core = ['reanalysis_specific_humidity_g_per_kg', 
 		'reanalysis_dew_point_temp_k', 
 		'station_avg_temp_c', 
-		'station_min_temp_c']
+		'station_min_temp_c',
+		'week']
 target = 'total_cases'
 min_error = np.inf
 lag_predictor = []
 pred = []
+predictor = core
 
 def preprocess_data(data_path, labels_path=None):
 	print('Reading data from:', data_path)
@@ -89,7 +91,7 @@ def set_predictor(lagging=ADD_LAGGING):
 	else:
 		pred = predictor
 		print('Set normal predictors.')
-	# print(pred)
+	print(pred)
 
 def add_lagging_data(df, lag_num=LAGGING_WEEK, full_data=ADD_FULL_LAG, expwa=EXPWA):
 	global lag_predictor
