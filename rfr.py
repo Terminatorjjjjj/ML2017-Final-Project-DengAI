@@ -23,11 +23,11 @@ WINDOW = 3
 MAX_EVAL = 1500
 
 ADD_LAGGING = True
-LAGGING_WEEK = 3
+LAGGING_WEEK = 9
 ADD_FULL_LAG = True
 EXPWA = False
 
-SHIFT_WEEK = True
+SHIFT_WEEK = False
 SHIFT_NUM = 1
 
 sj_train = []
