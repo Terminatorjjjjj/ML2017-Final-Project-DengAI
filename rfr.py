@@ -17,7 +17,7 @@ test_feature_path = sys.argv[3]
 submission_path = sys.argv[4]
 prediction_path = sys.argv[5]
 
-run_training = True
+run_training = False
 run_testing = True
 WINDOW = 3
 MAX_EVAL = 1500
@@ -59,6 +59,7 @@ min_error = np.inf
 lag_predictor = []
 pred = []
 predictor = core
+print('Core as pred.')
 
 def preprocess_data(data_path, labels_path=None):
 	print('Reading data from:', data_path)
@@ -91,7 +92,6 @@ def set_predictor(lagging=ADD_LAGGING):
 	else:
 		pred = predictor
 		print('Set normal predictors.')
-	print(pred)
 
 def add_lagging_data(df, lag_num=LAGGING_WEEK, full_data=ADD_FULL_LAG, expwa=EXPWA):
 	global lag_predictor
@@ -142,7 +142,7 @@ def add_rolling_mean():
 def moving_avg(data, n=3):
 	ret = np.cumsum(data)
 	ret[n::] = ret[n::] - ret[:-n]
-	ret = np.hstack((ret[:n-1],ret[n-1::]/n))
+	ret = np.hstack((data[:n-1],ret[n-1::]/n))
 	return ret
 
 def rolling_cross_validation(data, model, cv_split=5, window_size=3):
@@ -232,6 +232,7 @@ def training(data_path, labels_path):
 
 	### Set predictor
 	set_predictor()
+	print(pred)
 
 	### Training
 	global min_error, TRAIN_CITY
@@ -279,12 +280,12 @@ def testing(data_path, sub_path, pred_path, sj_model_path, iq_model_path):
 		iq_model = pickle.load(f)
 	print('Loading iq model from: ', iq_model_path)
 
-	sj_predictions = sj_model.predict(sj_test[pred]).astype(float)
-	iq_predictions = iq_model.predict(iq_test[pred]).astype(float)
+	sj_predictions = sj_model.predict(sj_test[pred]).astype(int)
+	iq_predictions = iq_model.predict(iq_test[pred]).astype(int)
 
-	print('Moving average window size:', WINDOW)
-	sj_predictions = np.round(moving_avg(sj_predictions, n=WINDOW)).astype(int)
-	iq_predictions = np.round(moving_avg(iq_predictions, n=WINDOW)).astype(int)
+	# print('Moving average window size:', WINDOW)
+	# sj_predictions = np.round(moving_avg(sj_predictions, n=WINDOW)).astype(int)
+	# iq_predictions = np.round(moving_avg(iq_predictions, n=WINDOW)).astype(int)
 	
 	submission = pd.read_csv(sub_path, index_col=[0, 1, 2])
 
@@ -302,8 +303,8 @@ def main():
 
 	### Testing
 	if run_testing:
-		sj_model_path = './rfr_models/sj_rfr_model.pickle'
-		iq_model_path = './rfr_models/iq_rfr_model.pickle'
+		sj_model_path = './rfr_models/18-sj_rfr.pickle'
+		iq_model_path = './rfr_models/18-iq_rfr.pickle'
 		testing(test_feature_path, submission_path, prediction_path, sj_model_path, iq_model_path)
 
 if __name__=='__main__':
