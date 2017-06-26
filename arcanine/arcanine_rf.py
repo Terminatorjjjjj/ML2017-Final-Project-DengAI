@@ -3,6 +3,8 @@ import pandas as pd
 from sklearn import dummy, metrics, cross_validation, ensemble
 from sklearn.ensemble import RandomForestRegressor
 import math
+import matplotlib.pyplot as plt
+import cPickle
 
 features = ['ndvi_ne', 'ndvi_nw', 'ndvi_se', 'ndvi_sw', 'precipitation_amt_mm',
        'reanalysis_air_temp_k', 'reanalysis_avg_temp_k',
@@ -55,7 +57,7 @@ for i,feature in enumerate(line):
 
 for i,feature in enumerate(line):
 	iq_test_dict[feature] = iq_test[:,i+4].reshape((len(iq_test[:,i+4]),1))
-"""
+
 # Add new feature
 sj_train_feature = sj_train[:,4:]
 sj_test_feature = sj_test[:,4:]
@@ -73,7 +75,7 @@ for feature in add_features:
 	
 for feature in add_features:
 	iq_test_feature = np.hstack((iq_test_feature,iq_test_dict[feature]**3))
-"""	
+
 # Choose feature
 sj_train_feature = sj_train_dict['reanalysis_dew_point_temp_k']
 sj_test_feature = sj_test_dict['reanalysis_dew_point_temp_k']
@@ -117,28 +119,35 @@ for i in range(len(iq_train_tmp)):
 	tmp = np.hstack((tmp,iq_label[:,3][i:i+10]))
 	iq_train_tmp[i] = tmp
 	
-sj_train_feature = sj_train_tmp
-iq_train_feature = iq_train_tmp
+sj_train_feature_1 = sj_train_tmp
+iq_train_feature_1 = iq_train_tmp
 	
 # Normalize
-sj_train_mean = np.mean(sj_train_feature, axis=0)
-sj_train_std = np.std(sj_train_feature.astype('float'), axis=0)
-sj_train_feature = (sj_train_feature - sj_train_mean) / sj_train_std
+sj_train_mean = np.mean(sj_train_feature_1, axis=0)
+sj_train_std = np.std(sj_train_feature_1.astype('float'), axis=0)
+sj_train_feature_1 = (sj_train_feature_1 - sj_train_mean) / sj_train_std
 
-iq_train_mean = np.mean(iq_train_feature, axis=0)
-iq_train_std = np.std(iq_train_feature.astype('float'), axis=0)
-iq_train_feature = (iq_train_feature - iq_train_mean) / iq_train_std
+iq_train_mean = np.mean(iq_train_feature_1, axis=0)
+iq_train_std = np.std(iq_train_feature_1.astype('float'), axis=0)
+iq_train_feature_1 = (iq_train_feature_1 - iq_train_mean) / iq_train_std
 
 # Split into train, val dataset
-sj_train, sj_val, sj_train_label, sj_val_label = cross_validation.train_test_split(sj_train_feature, sj_label[:,3][10:])
-iq_train, iq_val, iq_train_label, iq_val_label = cross_validation.train_test_split(iq_train_feature, iq_label[:,3][10:]) 
+sj_train, sj_val, sj_train_label, sj_val_label = cross_validation.train_test_split(sj_train_feature_1, sj_label[:,3][10:])
+iq_train, iq_val, iq_train_label, iq_val_label = cross_validation.train_test_split(iq_train_feature_1, iq_label[:,3][10:]) 
 
 # Random Forest Regression
-regressor_sj = RandomForestRegressor(n_estimators=250, min_samples_split=2)
+regressor_sj = RandomForestRegressor(n_estimators=i, min_samples_split=2)
 regressor_sj.fit(sj_train, sj_train_label)
-regressor_iq = RandomForestRegressor(n_estimators=200, min_samples_split=2)
+regressor_iq = RandomForestRegressor(n_estimators=i-50, min_samples_split=2)
 regressor_iq.fit(iq_train, iq_train_label)
+"""
+# Load model
+with open('arcanine_rf_sj_model_710.cpickle', 'rb') as f:
+	regressor_sj = cPickle.load(f)
 
+with open('arcanine_rf_iq_model_348.cpickle', 'rb') as f:
+	regressor_iq = cPickle.load(f)
+"""
 # Evaluate
 sj_train_result = regressor_sj.predict(sj_train)
 sj_val_result = regressor_sj.predict(sj_val)
@@ -150,6 +159,7 @@ for i,j in enumerate(sj_val_result):
 	
 loss_train = metrics.mean_absolute_error(sj_train_result, sj_train_label)
 loss_val = metrics.mean_absolute_error(sj_val_result, sj_val_label)
+loss_val_sj = loss_val
 print('sj Training loss = ' + str(loss_train))
 print('sj Validation loss = ' + str(loss_val))
 
@@ -165,24 +175,111 @@ loss_train = metrics.mean_absolute_error(iq_train_result, iq_train_label)
 loss_val = metrics.mean_absolute_error(iq_val_result, iq_val_label)
 print('iq Training loss = ' + str(loss_train))
 print('iq Validation loss = ' + str(loss_val))
+
+"""
+# Save model
+with open('arcanine_rf_sj_model.cpickle', 'wb') as f:
+    cPickle.dump(regressor_sj, f)
+
+with open('arcanine_rf_iq_model.cpickle', 'wb') as f:
+    cPickle.dump(regressor_iq, f)
 """
 # Predict & Output
-sj_test_feature = (sj_test_feature - sj_train_mean) / sj_train_std
-iq_test_feature = (iq_test_feature - iq_train_mean) / iq_train_std
+pred_sj = np.asarray([0.0 for i in range(len(sj_test_feature))])
+pred_iq = np.asarray([0.0 for i in range(len(iq_test_feature))])
 
-pred_sj = regressor_sj.predict(sj_test_feature)
-pred_iq = regressor_iq.predict(iq_test_feature)
+for i in range(len(sj_test_feature)):
+	if i == 0:
+		tmp = sj_train_feature[len(sj_train_feature)-1]
+		for j in range(len(sj_train_feature)-2, len(sj_train_feature)-11, -1):
+			tmp = np.hstack((tmp,sj_train_feature[j]))
+		reg_feature = tmp
+		tmp = np.hstack((tmp,sj_label[:,3][len(sj_train_feature)-10:len(sj_train_feature)]))
+		tmp = (tmp - sj_train_mean) / sj_train_std
+		pred_sj[i] = regressor_sj.predict(tmp.reshape((1, -1)))
+	elif (i > 0) and (i < 10):
+		tmp = sj_test_feature[i-1]
+		if i > 1:
+			for j in range(i-2, -1, -1):
+				tmp = np.hstack((tmp,sj_test_feature[j]))
+		tmp = np.hstack((tmp,reg_feature[:80-8*i]))
+		tmp = np.hstack((tmp,sj_label[:,3][len(sj_train_feature)-10+i:len(sj_train_feature)]))
+		for j in range(0, i, 1):
+			tmp = np.hstack((tmp,pred_sj[j]))
+		tmp = (tmp - sj_train_mean) / sj_train_std
+		pred_sj[i] = regressor_sj.predict(tmp.reshape((1, -1)))
+	else:
+		tmp = sj_test_feature[i-1]
+		for j in range(i-2, i-11, -1):
+			tmp = np.hstack((tmp,sj_test_feature[j]))
+		for j in range(i-10, i, 1):
+			tmp = np.hstack((tmp,pred_sj[j]))
+		tmp = (tmp - sj_train_mean) / sj_train_std
+		pred_sj[i] = regressor_sj.predict(tmp.reshape((1, -1)))
 
-file_write = open('arcanine_prediction_rf.csv', 'w')
+for i in range(len(iq_test_feature)):
+	if i == 0:
+		tmp = iq_train_feature[len(iq_train_feature)-1]
+		for j in range(len(iq_train_feature)-2, len(iq_train_feature)-11, -1):
+			tmp = np.hstack((tmp,iq_train_feature[j]))
+		reg_feature = tmp
+		tmp = np.hstack((tmp,iq_label[:,3][len(iq_train_feature)-10:len(iq_train_feature)]))
+		tmp = (tmp - iq_train_mean) / iq_train_std
+		pred_iq[i] = regressor_iq.predict(tmp.reshape((1, -1)))
+	elif (i > 0) and (i < 10):
+		tmp = iq_test_feature[i-1]
+		if i > 1:
+			for j in range(i-2, -1, -1):
+				tmp = np.hstack((tmp,iq_test_feature[j]))
+		tmp = np.hstack((tmp,reg_feature[:80-8*i]))
+		tmp = np.hstack((tmp,iq_label[:,3][len(iq_train_feature)-10+i:len(iq_train_feature)]))
+		for j in range(0, i, 1):
+			tmp = np.hstack((tmp,pred_iq[j]))
+		tmp = (tmp - iq_train_mean) / iq_train_std
+		pred_iq[i] = regressor_iq.predict(tmp.reshape((1, -1)))
+	else:
+		tmp = iq_test_feature[i-1]
+		for j in range(i-2, i-11, -1):
+			tmp = np.hstack((tmp,iq_test_feature[j]))
+		for j in range(i-10, i, 1):
+			tmp = np.hstack((tmp,pred_iq[j]))
+		tmp = (tmp - iq_train_mean) / iq_train_std
+		pred_iq[i] = regressor_iq.predict(tmp.reshape((1, -1)))
+
+file_read = pd.read_csv('yuah_pred.csv',encoding="big5")
+yuah = file_read.as_matrix()
+yuah_pred_sj = yuah[:,3][:260]
+yuah_pred_iq = yuah[:,3][260:]
+"""
+file_read_new = pd.read_csv('arcanine_prediction_rf.csv',encoding="big5")
+arcanine = file_read_new.as_matrix()
+arcanine_pred_sj = arcanine[:,3][:260]
+arcanine_pred_iq = arcanine[:,3][260:]
+
+# Plot the trend
+pred_sj = pred_sj*0.2 + yuah_pred_sj*0.8
+pred_iq = pred_iq*0.2 + yuah_pred_iq*0.8
+
+fig = plt.figure()
+plt.plot(np.arange(0, arcanine_pred_sj.shape[0]), arcanine_pred_sj, 'b')
+plt.plot(np.arange(0, pred_sj.shape[0]), pred_sj, 'r')
+plt.plot(np.arange(0, yuah_pred_sj.shape[0]), yuah_pred_sj, 'g')
+plt.show()
+fig.savefig('arcanine.png')
+"""
+# Endemble result
+pred_sj = pred_sj*0.2 + yuah_pred_sj*0.8
+pred_iq = pred_iq*0.2 + yuah_pred_iq*0.8
+
+file_write = open('best_2.csv', 'w')
 file_write.write('city,year,weekofyear,total_cases\n')
 for i,row in enumerate(pred_sj):
 	string = ''
 	for j in sj_test[i][:3]:
 		string += (str(j) + ',')
-	file_write.write(string + str(int(round(row))) + '\n')
+	file_write.write(string + str(row) + '\n')
 for i,row in enumerate(pred_iq):
 	string = ''
 	for j in iq_test[i][:3]:
 		string += (str(j) + ',')
-	file_write.write(string + str(int(round(row))) + '\n')
-"""
+	file_write.write(string + str(row) + '\n')
