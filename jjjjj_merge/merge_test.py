@@ -6,15 +6,14 @@ import time
 import numpy as np
 import pandas as pd
 from sklearn.ensemble import RandomForestRegressor
-from sklearn.model_selection import TimeSeriesSplit
 from sklearn.metrics import mean_absolute_error
-from hyperopt import hp, fmin, tpe, STATUS_OK, Trials
 import pickle
 
-train_feature_path = './train_feature.csv'
-test_feature_path = './test_feature.csv'
-prediction_path = './pred_merge_best3.csv'
-rnn_path = './best_2.csv'
+train_feature_path = '../data/train_feature.csv'
+test_feature_path = '../data/test_feature.csv'
+prediction_path = '../pred_merge.csv'
+merge_path = '../rnn2221.csv'
+merge_path_2 = '../arc.csv'
 
 WINDOW = 3
 MERGE_WEEKS = 20
@@ -135,6 +134,29 @@ def make_submission(result, id_path=test_feature_path, pred_path=prediction_path
 	prediction.to_csv(pred_path)
 	print('Save predictions to', pred_path)
 
+def plot_results(result, rnn_result, arc_result):
+	print('Plot results.')
+	import matplotlib.pyplot as plt
+	fig = plt.figure()
+	plt.plot(result, color='b')
+	plt.plot(rnn_result, color='r')
+	plt.plot(arc_result, color='g')
+	plt.title('Prediction Results')
+	plt.xlabel('Weeks')
+	plt.ylabel('Total Cases')
+	plt.legend(['RFR w/o lagging labels', 'RNN', 'RFR w/ lagging labels'], loc='upper right')
+	fig.savefig('results.png')
+
+def plot_result(result):
+	print('Plot ensemble result.')
+	import matplotlib.pyplot as plt
+	fig = plt.figure()
+	plt.plot(result, color='b')
+	plt.title('Ensemble Result')
+	plt.xlabel('Weeks')
+	plt.ylabel('Total Cases')
+	fig.savefig('ensemble.png')
+
 def main():
 	print('Start testing...')
 
@@ -174,9 +196,26 @@ def main():
 	result = np.concatenate([sj_result, iq_result])
 
 	### Merge with rnn
-	rnn = pd.read_csv(rnn_path, index_col=[0, 1, 2])
+	print('Load merge file:', merge_path)
+	rnn = pd.read_csv(merge_path, index_col=[0, 1, 2])
 	rnn_result = rnn[target].values
-	result = 0.5*result + 0.5*rnn_result
+	rnn_sj = rnn_result[:260]
+	rnn_iq = rnn_result[260::]
+	print('Load merge file:', merge_path_2)
+	arc = pd.read_csv(merge_path_2, index_col=[0, 1, 2])
+	arc_result = arc[target].values
+	arc_sj = arc_result[:260]
+	arc_iq = arc_result[260::]
+
+	plot_results(result, rnn_result, arc_result.astype(int))
+
+	sj_result = 0.4*sj_result + 0.4*rnn_sj + 0.2*arc_sj
+	# sj_result = 0.4*sj_result + 0.6*rnn_sj
+	iq_result = 0.6*iq_result + 0.2*rnn_iq + 0.2*arc_iq
+
+	# result = 0.4*result + 0.4*rnn_result + 0.2*arc_result
+	result = np.concatenate([sj_result, iq_result])
+	plot_result(result)
 
 	### Make submission	
 	make_submission(result.astype(int))

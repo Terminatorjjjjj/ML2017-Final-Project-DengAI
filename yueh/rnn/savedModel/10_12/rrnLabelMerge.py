@@ -1,4 +1,4 @@
-#!/usr/bin/env python2.7
+#!/usr/bin/env python3.6
 #coding=utf-8
 import numpy as np
 import pandas as pd
@@ -19,6 +19,11 @@ import pickle
 import keras.backend as K
 from keras.models import load_model
 import pickle
+import tensorflow as tf
+from keras.backend.tensorflow_backend import set_session
+config = tf.ConfigProto()
+config.gpu_options.per_process_gpu_memory_fraction = 0.3
+set_session(tf.Session(config=config))
 
 start_time = time.time()
 """
@@ -162,7 +167,7 @@ def main(model_sj_path, model_iq_path, add,weekConcat,weekPredAfter):
     return y_pred
 
 
-if __name__ == "__main__":
+if __name__=='__main__':
     test_feature = pd.read_csv(test_feature_file, encoding='big5')
     test_feature = test_feature.values
     test_feature = test_feature.astype(str)
