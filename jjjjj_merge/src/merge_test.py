@@ -9,11 +9,11 @@ from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import mean_absolute_error
 import pickle
 
-train_feature_path = './data/train_feature.csv'
-test_feature_path = './data/test_feature.csv'
-prediction_path = './pred_merge.csv'
-merge_path = './pred_files/rnn2221.csv'
-merge_path_2 = './pred_files/arc.csv'
+train_feature_path = '../data/train_feature.csv'
+test_feature_path = '../data/test_feature.csv'
+prediction_path = '../pred_merge_3.csv'
+merge_path = '../rnn2221.csv'
+merge_path_2 = '../arc.csv'
 
 WINDOW = 3
 MERGE_WEEKS = 20
@@ -134,29 +134,6 @@ def make_submission(result, id_path=test_feature_path, pred_path=prediction_path
 	prediction.to_csv(pred_path)
 	print('Save predictions to', pred_path)
 
-def plot_results(result, rnn_result, arc_result):
-	print('Plot results.')
-	import matplotlib.pyplot as plt
-	fig = plt.figure()
-	plt.plot(result, color='b')
-	plt.plot(rnn_result, color='r')
-	plt.plot(arc_result, color='g')
-	plt.title('Prediction Results')
-	plt.xlabel('Weeks')
-	plt.ylabel('Total Cases')
-	plt.legend(['RFR w/o lagging labels', 'RNN', 'RFR w/ lagging labels'], loc='upper right')
-	fig.savefig('results.png')
-
-def plot_result(result):
-	print('Plot ensemble result.')
-	import matplotlib.pyplot as plt
-	fig = plt.figure()
-	plt.plot(result, color='b')
-	plt.title('Ensemble Result')
-	plt.xlabel('Weeks')
-	plt.ylabel('Total Cases')
-	fig.savefig('ensemble.png')
-
 def main():
 	print('Start testing...')
 
@@ -171,7 +148,7 @@ def main():
 	print('Testing sj...')
 	params_1 = {'data': sj_test,
 				'pred': core_pred,
-				'model_path': '../rfr_models/18-sj_rfr.pickle',
+				'model_path': '../rfr/18-sj_rfr.pickle',
 				'shift_week': 0,
 				'lagging_week': 9}
 	result_1 = make_prediction(**params_1)
@@ -182,7 +159,7 @@ def main():
 	print('Testing iq...')
 	params_1 = {'data': iq_test,
 				'pred': core_pred,
-				'model_path': '../rfr_models/18-iq_rfr.pickle',
+				'model_path': '../rfr/18-iq_rfr.pickle',
 				'shift_week': 0,
 				'lagging_week': 9}
 	result_1 = make_prediction(**params_1)
@@ -193,8 +170,7 @@ def main():
 	print('Moving average window size:', WINDOW)
 	sj_result = np.round(moving_avg(sj_result, n=WINDOW)).astype(int)
 	iq_result = np.round(moving_avg(iq_result, n=WINDOW)).astype(int)
-	result = np.concatenate([sj_result, iq_result])
-
+	
 	### Merge with rnn
 	print('Load merge file:', merge_path)
 	rnn = pd.read_csv(merge_path, index_col=[0, 1, 2])
@@ -207,17 +183,13 @@ def main():
 	arc_sj = arc_result[:260]
 	arc_iq = arc_result[260::]
 
-	### Plot results
-	plot_results(result, rnn_result, arc_result.astype(int))
-
-	sj_result = 0.4*sj_result + 0.4*rnn_sj + 0.2*arc_sj
+	sj_result = 0.4*sj_result + 0.5*rnn_sj + 0.1*arc_sj
 	# sj_result = 0.4*sj_result + 0.6*rnn_sj
-	iq_result = 0.6*iq_result + 0.2*rnn_iq + 0.2*arc_iq
+	iq_result = 0.6*iq_result + 0.1*rnn_iq + 0.3*arc_iq
 
 	# result = 0.4*result + 0.4*rnn_result + 0.2*arc_result
 	result = np.concatenate([sj_result, iq_result])
-	plot_result(result)
-
+	
 	### Make submission	
 	make_submission(result.astype(int))
 

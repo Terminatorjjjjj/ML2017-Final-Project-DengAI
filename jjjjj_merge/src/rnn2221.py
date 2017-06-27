@@ -9,11 +9,11 @@ import h5py
 from keras.models import load_model
 
 # limit gpu resource usage
-import tensorflow as tf
-from keras.backend.tensorflow_backend import set_session
-config = tf.ConfigProto()
-config.gpu_options.per_process_gpu_memory_fraction = 0.3
-set_session(tf.Session(config=config))
+# import tensorflow as tf
+# from keras.backend.tensorflow_backend import set_session
+# config = tf.ConfigProto()
+# config.gpu_options.per_process_gpu_memory_fraction = 0.3
+# set_session(tf.Session(config=config))
 
 start_time = time.time()
 
@@ -36,7 +36,16 @@ def reshape(train_feature,weekConcat,weekPredAfter):
         trainF[i] =  train_feature[i:i+weekConcat,:]  
     return trainF
 
-def read_data():
+def drawPeak():
+    ## peak label
+    peak = np.hstack((np.arange(15,38),np.arange(67,90)))
+    peak = np.hstack((peak,np.arange(120,143)))
+    peak = np.hstack((peak,np.arange(172,195)))
+    peak = np.hstack((peak,np.arange(224,245)))
+    peak = peak - 2
+    return peak
+
+def main(model_sj_path, model_iq_path, add, weekConcat, weekPredAfter):   
     #-----Read training data---------------------------------------------------------
     print('Reading data from:', train_feature_path)
     train_feature = pd.read_csv(train_feature_path, encoding='big5')
@@ -72,26 +81,6 @@ def read_data():
     test_feature = np.hstack((test_feature[:,2].reshape(len(test_feature),1), test_feature[:,4::]))
     test_feature = test_feature.astype(float)
 
-    global g_train_feature, g_train_label, g_test_feature
-    g_train_feature = train_feature.copy()
-    g_train_label = train_label.copy()
-    g_test_feature = test_feature.copy()
-
-def drawPeak():
-    ## peak label
-    peak = np.hstack((np.arange(15,38),np.arange(67,90)))
-    peak = np.hstack((peak,np.arange(120,143)))
-    peak = np.hstack((peak,np.arange(172,195)))
-    peak = np.hstack((peak,np.arange(224,245)))
-    peak = peak - 2
-    return peak
-
-def main(model_sj_path, model_iq_path, add, weekConcat, weekPredAfter):
-    global g_train_feature, g_train_label, g_test_feature
-    train_feature = g_train_feature.copy()
-    train_label = g_train_label.copy()
-    test_feature = g_test_feature.copy()
-    
     weekPredAfter = 1
     
     if add == 1:
@@ -183,58 +172,56 @@ def main(model_sj_path, model_iq_path, add, weekConcat, weekPredAfter):
     y_pred = np.vstack((np.reshape(y_pred_sj,(y_pred_sj.shape[0],1)), np.reshape(y_pred_iq,(y_pred_iq.shape[0],1))))
     return y_pred
     
-if __name__=='__main__':
-    read_data()
-    
+if __name__=='__main__':    
     test_feature = pd.read_csv(test_feature_path, encoding='big5')
     test_feature = test_feature.values
     test_feature = test_feature.astype(str)
     test_tags = np.asarray(test_feature[:,:3])
     
-    weekConcat1 = 10
-    model_sj_path1 = './rnn2221/labelsj32_3000_100_adam_elu_softmax_1sj_256_512_256_1280.5_0.7_0.5_0.332_32_64_320.1_0.5_0.5_0.53_256_0.4_1280.4_64_0.4_10_3_.h5py'
-    model_iq_path1 = './rnn2221/labeliq32_3000_100_adam_elu_softmax_1iq_256_512_256_1280.5_0.7_0.5_0.332_32_64_320.1_0.5_0.5_0.51_256_0.4_1280.4_64_0.4_10_3_.h5py'
-    add1 = 3
-    weekPredAfter1 = 1
+    weekConcat_1 = 10
+    model_sj_path_1 = '../rnn2221/labelsj32_3000_100_adam_elu_softmax_1sj_256_512_256_1280.5_0.7_0.5_0.332_32_64_320.1_0.5_0.5_0.53_256_0.4_1280.4_64_0.4_10_3_.h5py'
+    model_iq_path_1 = '../rnn2221/labeliq32_3000_100_adam_elu_softmax_1iq_256_512_256_1280.5_0.7_0.5_0.332_32_64_320.1_0.5_0.5_0.51_256_0.4_1280.4_64_0.4_10_3_.h5py'
+    add_1 = 3
+    weekPredAfter_1 = 1
 
-    weekConcat2 = 10 
-    model_sj_path2 = './rnn2221/labelsj32_3000_100_adam_elu_softmax_2sj_256_512_256_1280.5_0.7_0.5_0.332_32_64_320.1_0.5_0.5_0.53_256_0.4_1280.4_64_0.4_10_4_.h5py'
-    model_iq_path2 = './rnn2221/labeliq32_3000_100_adam_elu_softmax_2iq_256_512_256_1280.5_0.7_0.5_0.332_32_64_320.1_0.5_0.5_0.52_256_0.4_1280.4_64_0.4_10_4_.h5py'
-    add2 = 4
-    weekPredAfter2 = 1
+    weekConcat_2 = 10 
+    model_sj_path_2 = '../rnn2221/labelsj32_3000_100_adam_elu_softmax_2sj_256_512_256_1280.5_0.7_0.5_0.332_32_64_320.1_0.5_0.5_0.53_256_0.4_1280.4_64_0.4_10_4_.h5py'
+    model_iq_path_2 = '../rnn2221/labeliq32_3000_100_adam_elu_softmax_2iq_256_512_256_1280.5_0.7_0.5_0.332_32_64_320.1_0.5_0.5_0.52_256_0.4_1280.4_64_0.4_10_4_.h5py'
+    add_2 = 4
+    weekPredAfter_2 = 1
 
-    weekConcat3 = 10
-    model_sj_path3 = './rnn2221/labelsj32_3000_100_adam_elu_softmax_1sj_256_512_256_1280.5_0.7_0.5_0.332_32_64_320.1_0.5_0.5_0.51_256_0.4_1280.4_64_0.4_10_3_.h5py'
-    model_iq_path3 = './rnn2221/labeliq32_3000_100_adam_elu_softmax_2iq_256_512_256_1280.5_0.7_0.5_0.332_32_64_320.1_0.5_0.5_0.53_256_0.4_1280.4_64_0.4_10_3_.h5py'
-    add3 = 3
-    weekPredAfter3 = 1
+    weekConcat_3 = 10
+    model_sj_path_3 = '../rnn2221/labelsj32_3000_100_adam_elu_softmax_1sj_256_512_256_1280.5_0.7_0.5_0.332_32_64_320.1_0.5_0.5_0.51_256_0.4_1280.4_64_0.4_10_3_.h5py'
+    model_iq_path_3 = '../rnn2221/labeliq32_3000_100_adam_elu_softmax_2iq_256_512_256_1280.5_0.7_0.5_0.332_32_64_320.1_0.5_0.5_0.53_256_0.4_1280.4_64_0.4_10_3_.h5py'
+    add_3 = 3
+    weekPredAfter_3 = 1
 
-    weekConcat4 = 5
-    model_sj_path4 = './rnn2221/sj_5_5_3_2_1-210-17.80.hdf5'
-    model_iq_path4 = './rnn2221/iq_5_5_3_2_1-126-0.68.hdf5'
-    add4 = 5
-    weekPredAfter4 = 2
+    weekConcat_4 = 5
+    model_sj_path_4 = '../rnn2221/sj_5_5_3_2_1-210-17.80.hdf5'
+    model_iq_path_4 = '../rnn2221/iq_5_5_3_2_1-126-0.68.hdf5'
+    add_4 = 5
+    weekPredAfter_4 = 2
 
-    weekConcat5 = 12
-    model_sj_path5 = './rnn2221/labelsj32_3000_100_adam_elu_softmax_1sj_256_512_256_1280.5_0.7_0.5_0.332_32_64_320.1_0.5_0.5_0.51_256_0.4_1280.4_64_0.4_12_4_.h5py'
-    model_iq_path5 = './rnn2221/labeliq32_3000_100_adam_elu_softmax_2iq_256_512_256_1280.5_0.7_0.5_0.332_32_64_320.1_0.5_0.5_0.52_256_0.4_1280.4_64_0.4_12_4_.h5py'
-    add5 = 4 
-    weekPredAfter5 = 1
+    weekConcat_5 = 12
+    model_sj_path_5 = '../rnn2221/labelsj32_3000_100_adam_elu_softmax_1sj_256_512_256_1280.5_0.7_0.5_0.332_32_64_320.1_0.5_0.5_0.51_256_0.4_1280.4_64_0.4_12_4_.h5py'
+    model_iq_path_5 = '../rnn2221/labeliq32_3000_100_adam_elu_softmax_2iq_256_512_256_1280.5_0.7_0.5_0.332_32_64_320.1_0.5_0.5_0.52_256_0.4_1280.4_64_0.4_12_4_.h5py'
+    add_5 = 4 
+    weekPredAfter_5 = 1
     
-    y_pred1 = main(model_sj_path1, model_iq_path1, add1, weekConcat1, weekPredAfter1)
-    y_pred2 = main(model_sj_path2, model_iq_path2, add2, weekConcat2, weekPredAfter2)
-    y_pred3 = main(model_sj_path3, model_iq_path3, add3, weekConcat3, weekPredAfter3)
-    y_pred4 = main(model_sj_path4, model_iq_path4, add4, weekConcat4, weekPredAfter4)
-    y_pred5 = main(model_sj_path5, model_iq_path5, add5, weekConcat5, weekPredAfter5)
+    y_pred_1 = main(model_sj_path_1, model_iq_path_1, add_1, weekConcat_1, weekPredAfter_1)
+    y_pred_2 = main(model_sj_path_2, model_iq_path_2, add_2, weekConcat_2, weekPredAfter_2)
+    y_pred_3 = main(model_sj_path_3, model_iq_path_3, add_3, weekConcat_3, weekPredAfter_3)
+    y_pred_4 = main(model_sj_path_4, model_iq_path_4, add_4, weekConcat_4, weekPredAfter_4)
+    y_pred_5 = main(model_sj_path_5, model_iq_path_5, add_5, weekConcat_5, weekPredAfter_5)
 
     peak = drawPeak()
-    y_pred = (y_pred1 + y_pred2 + y_pred3 +  y_pred5)/4
+    y_pred = (y_pred_1 + y_pred_2 + y_pred_3 +  y_pred_5)/4
     
     idx = 0
     i = 0
     while i <= peak[peak.shape[0]-1]:
         if i == peak[idx]:
-            y_pred[i] = (y_pred[i] * 4 + y_pred4[i] * 1)/5
+            y_pred[i] = (y_pred[i] * 4 + y_pred_4[i] * 1)/5
             idx = idx + 1
         i = i + 1
 

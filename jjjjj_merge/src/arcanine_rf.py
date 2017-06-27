@@ -5,7 +5,6 @@ import numpy as np
 import pandas as pd
 from sklearn import dummy, metrics, cross_validation, ensemble
 from sklearn.ensemble import RandomForestRegressor
-import math
 import pickle
 import time
 
@@ -20,16 +19,7 @@ sj_model_path = '../arc/arc_sj_6-9267-300.pickle'
 iq_model_path = '../arc/arc_iq_3-3047-250.pickle'
 
 TRAIN = False
-ESTIMATORS = 500
-
-features = ['ndvi_ne', 'ndvi_nw', 'ndvi_se', 'ndvi_sw', 'precipitation_amt_mm',
-       'reanalysis_air_temp_k', 'reanalysis_avg_temp_k',
-       'reanalysis_dew_point_temp_k', 'reanalysis_max_air_temp_k',
-       'reanalysis_min_air_temp_k', 'reanalysis_precip_amt_kg_per_m2',
-       'reanalysis_relative_humidity_percent', 'reanalysis_sat_precip_amt_mm',
-       'reanalysis_specific_humidity_g_per_kg', 'reanalysis_tdtr_k',
-       'station_avg_temp_c', 'station_diur_temp_rng_c', 'station_max_temp_c',
-	   'station_min_temp_c', 'station_precip_mm']
+ESTIMATORS = 300
 
 add_features = ['reanalysis_specific_humidity_g_per_kg', 'station_min_temp_c', 'station_avg_temp_c']
 
@@ -55,7 +45,6 @@ sj_test = test[:260]
 iq_test = test[260:]
 sj_label = label[:936]
 iq_label = label[936:]
-
 del train, test, label
 
 file_read = open(train_feature_path, 'r')
@@ -112,8 +101,6 @@ for feature in add_features:
 # Add ten weeks feature
 sj_train_tmp = np.zeros((len(sj_train_feature)-10,90))
 iq_train_tmp = np.zeros((len(iq_train_feature)-10,90))
-#sj_train_tmp = sj_train_feature[9:,:]
-#iq_train_tmp = iq_train_feature[9:,:]
 
 for i in range(len(sj_train_tmp)):
 	tmp = sj_train_feature[i+9]
@@ -186,9 +173,9 @@ if TRAIN:
 
 	# Save model
 	print('Saving models.')
-	with open('arc_sj.pickle', 'wb') as f:
+	with open('../arc_sj.pickle', 'wb') as f:
 	    pickle.dump(regressor_sj, f)
-	with open('arc_iq.pickle', 'wb') as f:
+	with open('../arc_iq.pickle', 'wb') as f:
 	    pickle.dump(regressor_iq, f)
 else:
 	# Load model
@@ -267,26 +254,7 @@ if merge_path:
 	yuah = file_read.as_matrix()
 	yuah_pred_sj = yuah[:,3][:260]
 	yuah_pred_iq = yuah[:,3][260:]
-"""
-import matplotlib.pyplot as plt
-file_read_new = pd.read_csv('arcanine_prediction_rf.csv',encoding="big5")
-arcanine = file_read_new.as_matrix()
-arcanine_pred_sj = arcanine[:,3][:260]
-arcanine_pred_iq = arcanine[:,3][260:]
-
-# Plot the trend
-pred_sj = pred_sj*0.2 + yuah_pred_sj*0.8
-pred_iq = pred_iq*0.2 + yuah_pred_iq*0.8
-
-fig = plt.figure()
-plt.plot(np.arange(0, arcanine_pred_sj.shape[0]), arcanine_pred_sj, 'b')
-plt.plot(np.arange(0, pred_sj.shape[0]), pred_sj, 'r')
-plt.plot(np.arange(0, yuah_pred_sj.shape[0]), yuah_pred_sj, 'g')
-plt.show()
-fig.savefig('arcanine.png')
-"""
-# Endemble result
-if merge_path:
+	# Endemble result
 	pred_sj = pred_sj*0.2 + yuah_pred_sj*0.8
 	pred_iq = pred_iq*0.2 + yuah_pred_iq*0.8
 
