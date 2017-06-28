@@ -6,17 +6,43 @@
 
 ## Directory Structure
 **ML2017/final/**
-	-	**src/**
-		+	**data/**: Raw trainging and testing data.
-		+	**arc/**: Random forest models with lagging labels.
-		+	**rfr/**: Random forest models without lagging labels.
-		+	**rnn/**: RNN models.
-		+	**ensmeble.sh**: Shell script for reproduction.
-		+	**arcanin_rf.py**: Testing code for random forest models with lagging labels.
-		+	**merge_test.py**: Testing code for random forest models without lagging labels.
-		+	**rnn2221.py**: Testing code for RNN ensmeble models.
-	-	**Report.pdf**
-	-	**requirements.txt**
+-	**src/**
+	-	**data/**: Raw trainging and testing data.
+	-	**arc/**: Random forest models with lagging labels.
+	-	**rfr/**: Random forest models without lagging labels.
+	-	**rnn/**: RNN models.
+	-	**ensmeble.sh**: Shell script for reproduction.
+	-	**arcanin_rf.py**: Testing code for random forest models with lagging labels.
+	-	**merge_test.py**: Testing code for random forest models without lagging labels.
+	-	**rnn2221.py**: Testing code for RNN ensmeble models.
+-	**Report.pdf**
+-	**requirements.txt**
+
+
+-	**src/**
+	+	**data/**: Raw trainging and testing data.
+	+	**arc/**: Random forest models with lagging labels.
+	+	**rfr/**: Random forest models without lagging labels.
+	+	**rnn/**: RNN models.
+	+	**ensmeble.sh**: Shell script for reproduction.
+	+	**arcanin_rf.py**: Testing code for random forest models with lagging labels.
+	+	**merge_test.py**: Testing code for random forest models without lagging labels.
+	+	**rnn2221.py**: Testing code for RNN ensmeble models.
+-	**Report.pdf**
+-	**requirements.txt**
+
+
+>	**src/**
+	>>	**data/**: Raw trainging and testing data.
+	>>	**arc/**: Random forest models with lagging labels.
+	>>	**rfr/**: Random forest models without lagging labels.
+	>>	**rnn/**: RNN models.
+	>>	**ensmeble.sh**: Shell script for reproduction.
+	>>	**arcanin_rf.py**: Testing code for random forest models with lagging labels.
+	>>	**merge_test.py**: Testing code for random forest models without lagging labels.
+	>>	**rnn2221.py**: Testing code for RNN ensmeble models.
+>	**Report.pdf**
+>	**requirements.txt**
 
 
 ## Reproduce Prediction
