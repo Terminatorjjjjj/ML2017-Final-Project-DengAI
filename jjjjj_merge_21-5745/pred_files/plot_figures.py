@@ -53,12 +53,19 @@ def main():
 	# plot_result(train_sj, 'Training Labels: sj', 'train_sj')
 	# plot_result(train_iq, 'Training Labels: iq', 'train_iq')
 
-	### Plot ensemble result
-	# sj_result = 0.4*rfr_sj + 0.4*rnn_sj + 0.2*arc_result
-	# # iq_result = rfr_iq
-	# iq_result = 0.6*rfr_iq + 0.2*rnn_iq + 0.2*arc_iq
-	# result = np.concatenate([sj_result, iq_result])
-	# plot_result(result, 'Ensembel Result', 'ensemble')
+	### Plot ensemble result 451 523
+
+	sj_result = rfr_sj
+	for i in range(rfr_sj.shape[0]):
+		if arc_sj[i] - 0.5*rfr_sj[i] - 0.5*rnn_sj[i] >= 90:
+			sj_result[i] = 0.5*rfr_sj[i] + 0.5*rnn_sj[i]
+		else:
+			sj_result[i] = 0.4*rfr_sj[i] + 0.4*rnn_sj[i] + 0.2*arc_sj[i]
+	# sj_result = 0.3*rfr_sj + 0.5*rnn_sj + 0.2*arc_sj
+	# iq_result = rfr_iq
+	iq_result = 0.4*rfr_iq + 0.4*rnn_iq + 0.2*arc_iq
+	result = np.concatenate([sj_result, iq_result])
+	plot_result(result, 'Ensembel Result', 'ensemble')
 
 	### Plot predictions comparison
 	# plot_results(rfr_sj, rnn_sj, arc_sj, 'Prediction Results: sj', 'results-sj')

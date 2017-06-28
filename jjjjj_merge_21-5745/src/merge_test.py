@@ -183,9 +183,15 @@ def main():
 	arc_sj = arc_result[:260]
 	arc_iq = arc_result[260::]
 
-	sj_result = 0.4*sj_result + 0.5*rnn_sj + 0.1*arc_sj
+	for i in range(sj_result.shape[0]):
+		if arc_sj[i] - 0.5*sj_result[i] - 0.5*rnn_sj[i] >= 90:
+			sj_result[i] = 0.5*sj_result[i] + 0.5*rnn_sj[i]
+		else:
+			sj_result[i] = 0.4*sj_result[i] + 0.4*rnn_sj[i] + 0.2*arc_sj[i]
+	# sj_result = 0.3*sj_result + 0.5*rnn_sj + 0.2*arc_sj
 	# sj_result = 0.4*sj_result + 0.6*rnn_sj
-	iq_result = 0.6*iq_result + 0.1*rnn_iq + 0.3*arc_iq
+	iq_result = 0.4*iq_result + 0.4*rnn_iq + 0.2*arc_iq
+	# iq_result = 0.4*iq_result + 0.4*rnn_iq + 0.2*arc_iq
 
 	# result = 0.4*result + 0.4*rnn_result + 0.2*arc_result
 	result = np.concatenate([sj_result, iq_result])
