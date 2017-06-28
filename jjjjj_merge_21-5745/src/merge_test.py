@@ -11,7 +11,7 @@ import pickle
 
 train_feature_path = './data/train_feature.csv'
 test_feature_path = './data/test_feature.csv'
-prediction_path = './ensmeble_result.csv'
+prediction_path = './ensemble_result.csv'
 merge_path = './rnn2221.csv'
 merge_path_2 = './arc.csv'
 
