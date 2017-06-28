@@ -3,19 +3,21 @@
 ## DengAI: Predicting Disease Spread
 [Competition Site](https://www.drivendata.org/competitions/44/dengai-predicting-disease-spread/)
 
+
 ## Directory Structure
 **ML2017/final/**
 	-	**src/**
-		-	**data/**: Raw trainging and testing data.
-		-	**arc/**: Random forest models with lagging labels.
-		-	**rfr/**: Random forest models without lagging labels.
-		-	**rnn/**: RNN models.
-		-	**ensmeble.sh**: Shell script for reproduction.
-		-	**arcanin_rf.py**: Testing code for random forest models with lagging labels.
-		-	**merge_test.py**: Testing code for random forest models without lagging labels.
-		-	**rnn2221.py**: Testing code for RNN ensmeble models.
+		+	**data/**: Raw trainging and testing data.
+		+	**arc/**: Random forest models with lagging labels.
+		+	**rfr/**: Random forest models without lagging labels.
+		+	**rnn/**: RNN models.
+		+	**ensmeble.sh**: Shell script for reproduction.
+		+	**arcanin_rf.py**: Testing code for random forest models with lagging labels.
+		+	**merge_test.py**: Testing code for random forest models without lagging labels.
+		+	**rnn2221.py**: Testing code for RNN ensmeble models.
 	-	**Report.pdf**
 	-	**requirements.txt**
+
 
 ## Reproduce Prediction
 1. Under ML2017/final/, install required packages with **requirements.txt**.
