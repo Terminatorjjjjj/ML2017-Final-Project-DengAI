@@ -17,10 +17,10 @@ from keras.models import load_model
 
 start_time = time.time()
 
-train_feature_path = '../data/train_feature.csv'
-train_label_path = '../data/train_label.csv'
-test_feature_path = '../data/test_feature.csv'
-prediction_path = '../rnn2221.csv'
+train_feature_path = './data/train_feature.csv'
+train_label_path = './data/train_label.csv'
+test_feature_path = './data/test_feature.csv'
+prediction_path = './rnn2221.csv'
 arg = False
 
 g_train_feature = []
@@ -179,32 +179,32 @@ if __name__=='__main__':
     test_tags = np.asarray(test_feature[:,:3])
     
     weekConcat_1 = 10
-    model_sj_path_1 = '../rnn2221/labelsj32_3000_100_adam_elu_softmax_1sj_256_512_256_1280.5_0.7_0.5_0.332_32_64_320.1_0.5_0.5_0.53_256_0.4_1280.4_64_0.4_10_3_.h5py'
-    model_iq_path_1 = '../rnn2221/labeliq32_3000_100_adam_elu_softmax_1iq_256_512_256_1280.5_0.7_0.5_0.332_32_64_320.1_0.5_0.5_0.51_256_0.4_1280.4_64_0.4_10_3_.h5py'
+    model_sj_path_1 = './rnn/labelsj32_3000_100_adam_elu_softmax_1sj_256_512_256_1280.5_0.7_0.5_0.332_32_64_320.1_0.5_0.5_0.53_256_0.4_1280.4_64_0.4_10_3_.h5py'
+    model_iq_path_1 = './rnn/labeliq32_3000_100_adam_elu_softmax_1iq_256_512_256_1280.5_0.7_0.5_0.332_32_64_320.1_0.5_0.5_0.51_256_0.4_1280.4_64_0.4_10_3_.h5py'
     add_1 = 3
     weekPredAfter_1 = 1
 
     weekConcat_2 = 10 
-    model_sj_path_2 = '../rnn2221/labelsj32_3000_100_adam_elu_softmax_2sj_256_512_256_1280.5_0.7_0.5_0.332_32_64_320.1_0.5_0.5_0.53_256_0.4_1280.4_64_0.4_10_4_.h5py'
-    model_iq_path_2 = '../rnn2221/labeliq32_3000_100_adam_elu_softmax_2iq_256_512_256_1280.5_0.7_0.5_0.332_32_64_320.1_0.5_0.5_0.52_256_0.4_1280.4_64_0.4_10_4_.h5py'
+    model_sj_path_2 = './rnn/labelsj32_3000_100_adam_elu_softmax_2sj_256_512_256_1280.5_0.7_0.5_0.332_32_64_320.1_0.5_0.5_0.53_256_0.4_1280.4_64_0.4_10_4_.h5py'
+    model_iq_path_2 = './rnn/labeliq32_3000_100_adam_elu_softmax_2iq_256_512_256_1280.5_0.7_0.5_0.332_32_64_320.1_0.5_0.5_0.52_256_0.4_1280.4_64_0.4_10_4_.h5py'
     add_2 = 4
     weekPredAfter_2 = 1
 
     weekConcat_3 = 10
-    model_sj_path_3 = '../rnn2221/labelsj32_3000_100_adam_elu_softmax_1sj_256_512_256_1280.5_0.7_0.5_0.332_32_64_320.1_0.5_0.5_0.51_256_0.4_1280.4_64_0.4_10_3_.h5py'
-    model_iq_path_3 = '../rnn2221/labeliq32_3000_100_adam_elu_softmax_2iq_256_512_256_1280.5_0.7_0.5_0.332_32_64_320.1_0.5_0.5_0.53_256_0.4_1280.4_64_0.4_10_3_.h5py'
+    model_sj_path_3 = './rnn/labelsj32_3000_100_adam_elu_softmax_1sj_256_512_256_1280.5_0.7_0.5_0.332_32_64_320.1_0.5_0.5_0.51_256_0.4_1280.4_64_0.4_10_3_.h5py'
+    model_iq_path_3 = './rnn/labeliq32_3000_100_adam_elu_softmax_2iq_256_512_256_1280.5_0.7_0.5_0.332_32_64_320.1_0.5_0.5_0.53_256_0.4_1280.4_64_0.4_10_3_.h5py'
     add_3 = 3
     weekPredAfter_3 = 1
 
     weekConcat_4 = 5
-    model_sj_path_4 = '../rnn2221/sj_5_5_3_2_1-210-17.80.hdf5'
-    model_iq_path_4 = '../rnn2221/iq_5_5_3_2_1-126-0.68.hdf5'
+    model_sj_path_4 = './rnn/sj_5_5_3_2_1-210-17.80.hdf5'
+    model_iq_path_4 = './rnn/iq_5_5_3_2_1-126-0.68.hdf5'
     add_4 = 5
     weekPredAfter_4 = 2
 
     weekConcat_5 = 12
-    model_sj_path_5 = '../rnn2221/labelsj32_3000_100_adam_elu_softmax_1sj_256_512_256_1280.5_0.7_0.5_0.332_32_64_320.1_0.5_0.5_0.51_256_0.4_1280.4_64_0.4_12_4_.h5py'
-    model_iq_path_5 = '../rnn2221/labeliq32_3000_100_adam_elu_softmax_2iq_256_512_256_1280.5_0.7_0.5_0.332_32_64_320.1_0.5_0.5_0.52_256_0.4_1280.4_64_0.4_12_4_.h5py'
+    model_sj_path_5 = './rnn/labelsj32_3000_100_adam_elu_softmax_1sj_256_512_256_1280.5_0.7_0.5_0.332_32_64_320.1_0.5_0.5_0.51_256_0.4_1280.4_64_0.4_12_4_.h5py'
+    model_iq_path_5 = './rnn/labeliq32_3000_100_adam_elu_softmax_2iq_256_512_256_1280.5_0.7_0.5_0.332_32_64_320.1_0.5_0.5_0.52_256_0.4_1280.4_64_0.4_12_4_.h5py'
     add_5 = 4 
     weekPredAfter_5 = 1
     

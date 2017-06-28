@@ -61,11 +61,10 @@ def main():
 			sj_result[i] = 0.5*rfr_sj[i] + 0.5*rnn_sj[i]
 		else:
 			sj_result[i] = 0.4*rfr_sj[i] + 0.4*rnn_sj[i] + 0.2*arc_sj[i]
-	# sj_result = 0.3*rfr_sj + 0.5*rnn_sj + 0.2*arc_sj
-	# iq_result = rfr_iq
+	# sj_result = 0.4*rfr_sj + 0.4*rnn_sj + 0.2*arc_sj
 	iq_result = 0.4*rfr_iq + 0.4*rnn_iq + 0.2*arc_iq
 	result = np.concatenate([sj_result, iq_result])
-	plot_result(result, 'Ensembel Result', 'ensemble')
+	plot_result(result, 'Ensemble Result', 'ensemble')
 
 	### Plot predictions comparison
 	# plot_results(rfr_sj, rnn_sj, arc_sj, 'Prediction Results: sj', 'results-sj')

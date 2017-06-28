@@ -7,16 +7,17 @@ from sklearn import dummy, metrics, cross_validation, ensemble
 from sklearn.ensemble import RandomForestRegressor
 import pickle
 import time
+import sys
 
 start_time = time.time()
 
-train_feature_path = '../data/train_feature.csv'
-train_label_path = '../data/train_label.csv'
-test_feature_path = '../data/test_feature.csv'
-prediction_path = '../arc.csv'
+train_feature_path = './data/train_feature.csv'
+train_label_path = './data/train_label.csv'
+test_feature_path = './data/test_feature.csv'
+prediction_path = './arc.csv'
 merge_path = ''
-sj_model_path = '../arc/arc_sj_6-9267-300.pickle'
-iq_model_path = '../arc/arc_iq_3-3047-250.pickle'
+sj_model_path = './arc/arc_sj_6-9267-300.pickle'
+iq_model_path = './arc/arc_iq_3-3047-250.pickle'
 
 TRAIN = False
 ESTIMATORS = 300
@@ -173,9 +174,9 @@ if TRAIN:
 
 	# Save model
 	print('Saving models.')
-	with open('../arc_sj.pickle', 'wb') as f:
+	with open('./arc_sj.pickle', 'wb') as f:
 	    pickle.dump(regressor_sj, f)
-	with open('../arc_iq.pickle', 'wb') as f:
+	with open('./arc_iq.pickle', 'wb') as f:
 	    pickle.dump(regressor_iq, f)
 else:
 	# Load model

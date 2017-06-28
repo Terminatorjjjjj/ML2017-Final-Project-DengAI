@@ -9,11 +9,11 @@ from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import mean_absolute_error
 import pickle
 
-train_feature_path = '../data/train_feature.csv'
-test_feature_path = '../data/test_feature.csv'
-prediction_path = '../pred_merge_3.csv'
-merge_path = '../rnn2221.csv'
-merge_path_2 = '../arc.csv'
+train_feature_path = './data/train_feature.csv'
+test_feature_path = './data/test_feature.csv'
+prediction_path = './ensmeble_result.csv'
+merge_path = './rnn2221.csv'
+merge_path_2 = './arc.csv'
 
 WINDOW = 3
 MERGE_WEEKS = 20
@@ -148,7 +148,7 @@ def main():
 	print('Testing sj...')
 	params_1 = {'data': sj_test,
 				'pred': core_pred,
-				'model_path': '../rfr/18-sj_rfr.pickle',
+				'model_path': './rfr/18-sj_rfr.pickle',
 				'shift_week': 0,
 				'lagging_week': 9}
 	result_1 = make_prediction(**params_1)
@@ -159,7 +159,7 @@ def main():
 	print('Testing iq...')
 	params_1 = {'data': iq_test,
 				'pred': core_pred,
-				'model_path': '../rfr/18-iq_rfr.pickle',
+				'model_path': './rfr/18-iq_rfr.pickle',
 				'shift_week': 0,
 				'lagging_week': 9}
 	result_1 = make_prediction(**params_1)
@@ -188,12 +188,8 @@ def main():
 			sj_result[i] = 0.5*sj_result[i] + 0.5*rnn_sj[i]
 		else:
 			sj_result[i] = 0.4*sj_result[i] + 0.4*rnn_sj[i] + 0.2*arc_sj[i]
-	# sj_result = 0.3*sj_result + 0.5*rnn_sj + 0.2*arc_sj
-	# sj_result = 0.4*sj_result + 0.6*rnn_sj
 	iq_result = 0.4*iq_result + 0.4*rnn_iq + 0.2*arc_iq
-	# iq_result = 0.4*iq_result + 0.4*rnn_iq + 0.2*arc_iq
 
-	# result = 0.4*result + 0.4*rnn_result + 0.2*arc_result
 	result = np.concatenate([sj_result, iq_result])
 	
 	### Make submission	
