@@ -12,7 +12,7 @@
 	-	**arc/**: Random forest models with lagging labels.
 	-	**rfr/**: Random forest models without lagging labels.
 	-	**rnn/**: RNN models.
-	-	**training/***: Training code.
+	-	**training/**: Training code.
 	-	**ensmeble.sh**: Shell script for reproduction.
 	-	**arcanin_rf.py**: Testing code for random forest models with lagging labels. (preprocessing included)
 	-	**merge_test.py**: Testing code for random forest models without lagging labels and final ensemble. (preprocessing included)
