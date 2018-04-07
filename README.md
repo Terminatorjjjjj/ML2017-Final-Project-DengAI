@@ -7,6 +7,7 @@
 ## Directory Structure
 
 **shared/**: Training code and models shared between project members.
+
 **src/**
 -	**data/**: Raw trainging and testing data cs files.
 -	**arc/**: Random forest models with lagging labels.
@@ -17,8 +18,11 @@
 -	**arcanin_rf.py**: Testing code for random forest models with lagging labels. (preprocessing included)
 -	**merge_test.py**: Testing code for random forest models without lagging labels and final ensemble. (preprocessing included)
 -	**rnn2221.py**: Testing code for RNN ensmeble models. (preprocessing included)
+
 **Report.pdf**
+
 **requirements.txt**
+
 **README.md**
 
 
