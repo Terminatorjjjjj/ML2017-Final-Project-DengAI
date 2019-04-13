@@ -1,4 +1,4 @@
-# Final project for Machine Learning at Department of Electrical Engineering, National Taiwan University, Spring 2017
+## Final project for Machine Learning
 
 
 ## DengAI: Predicting Disease Spread
