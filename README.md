@@ -1,4 +1,4 @@
-# Final project for Machine Learning Course 
+# DrivenData Competition & Final project for Machine Learning  
 
 
 ## DengAI: Predicting Disease Spread
