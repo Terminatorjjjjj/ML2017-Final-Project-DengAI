@@ -1,4 +1,4 @@
-## Final project for Machine Learning
+# Final project for Machine Learning Course 
 
 
 ## DengAI: Predicting Disease Spread
